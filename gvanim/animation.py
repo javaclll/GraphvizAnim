@@ -30,12 +30,16 @@ class Step( object ):
 	def __init__( self, step = None ):
 		if step:
 			self.V = step.V.copy()
+			self.Color = step.Color.copy()
 			self.E = step.E.copy()
+			self.Label = step.Label.copy()
 			self.lV = step.lV.copy()
 			self.lE = step.lE.copy()
 		else:
 			self.V = set()
+			self.Color = dict()
 			self.E = set()
+			self.Label = dict()
 			self.lV = dict()
 			self.lE = dict()
 		self.hV = dict()
@@ -76,8 +80,8 @@ class Animation( object ):
 	def next_step( self, clean = False ):
 		self._actions.append( action.NextStep( clean ) )
 
-	def add_node( self, v ):
-		self._actions.append( action.AddNode( v ) )
+	def add_node( self, v, color = "lightblue"):
+		self._actions.append( action.AddNode( v , color = color) )
 
 	def highlight_node( self, v, color = 'red' ):
 		self._actions.append( action.HighlightNode( v, color = color ) )
@@ -91,8 +95,8 @@ class Animation( object ):
 	def remove_node( self, v ):
 		self._actions.append( action.RemoveNode( v ) )
 
-	def add_edge( self, u, v ):
-		self._actions.append( action.AddEdge( u, v ) )
+	def add_edge( self, u, v , label = ''):
+		self._actions.append( action.AddEdge( u, v , label) )
 
 	def highlight_edge( self, u, v, color = 'red' ):
 		self._actions.append( action.HighlightEdge( u, v, color = color ) )
@@ -141,15 +145,23 @@ class Animation( object ):
 	def graphs( self ):
 		steps = self.steps()
 		V, E = set(), set()
+		Color = dict()
+		Label = dict()
 		for step in steps:
 			V |= step.V
 			E |= step.E
+			Color = step.Color
+			Label = step.Label
+
 		graphs = []
 		for n, s in enumerate( steps ):
-			graph = [ 'digraph G {' ]
-			for v in V: graph.append( '"{}" {};'.format( quote( str( v ) ), s.node_format( v ) ) )
-			for e in E: graph.append( '"{}" -> "{}" {};'.format( quote( str( e[ 0 ] ) ), quote( str( e[ 1 ] ) ), s.edge_format( e ) ) )
+			graph = [ 'digraph G { layout=dot dpi=500' ]
+			for v in V: 
+				graph.append( '"{}" [color={} shape=egg style=filled] {};'.format( quote( str(v) ), str(Color[v]), s.node_format( v ) ) )
+			for e in E: 
+				graph.append( '"{}" -> "{}" [label="{}" fontsize=9] {};'.format( quote( str( e[ 0 ] ) ), quote( str( e[ 1 ] ) ), str(Label[e]), s.edge_format( e ) ) )
 			graph.append( '}' )
 			graphs.append( '\n'.join( graph ) )
+
 		
 		return graphs

@@ -23,10 +23,12 @@ class NextStep( object ):
 		steps.append( Step( None if self.clean else steps[ -1 ] ) )
 
 class AddNode( object ):
-	def __init__( self, v ):
+	def __init__( self, v, color = 'lightblue'):
 		self.v = v
+		self.color = color
 	def __call__( self, steps ):
 		steps[ -1 ].V.add( self.v )
+		steps[ -1 ].Color[ self.v ] = self.color
 
 class HighlightNode( object ):
 	def __init__( self, v, color = 'red' ):
@@ -74,13 +76,15 @@ class RemoveNode( object ):
 				del steps[ -1 ].hE[ e ]
 
 class AddEdge( object ):
-	def __init__( self, u, v ):
+	def __init__( self, u, v , label = ''):
 		self.u = u
 		self.v = v
+		self.label = label
 	def __call__( self, steps ):
 		steps[ -1 ].V.add( self.u )
 		steps[ -1 ].V.add( self.v )
 		steps[ -1 ].E.add( ( self.u, self.v ) )
+		steps[ -1 ].Label[( self.u, self.v )] = self.label
 
 class HighlightEdge( object ):
 	def __init__( self, u, v, color = 'red' ):
@@ -114,6 +118,7 @@ class UnlabelEdge( object ):
 		steps[ -1 ].E.add( ( self.u, self.v ) )
 		try:
 			del steps[ -1 ].lE[ ( self.u, self.v ) ]
+			del steps[ -1 ].Label( (self.u, self.v) )
 		except KeyError:
 			pass
 
@@ -124,6 +129,7 @@ class RemoveEdge( object ):
 	def __call__( self, steps ):
 		steps[ -1 ].E.discard( ( self.u, self.v ) )
 		try:
+			del steps[ -1 ].Label( (self.u, self.v) )
 			del steps[ -1 ].hE[ ( self.u, self.v ) ]
 			del steps[ -1 ].lE[ ( self.u, self.v ) ]
 		except KeyError:
