@@ -118,7 +118,6 @@ class UnlabelEdge( object ):
 		steps[ -1 ].E.add( ( self.u, self.v ) )
 		try:
 			del steps[ -1 ].lE[ ( self.u, self.v ) ]
-			del steps[ -1 ].Label( (self.u, self.v) )
 		except KeyError:
 			pass
 
@@ -129,7 +128,6 @@ class RemoveEdge( object ):
 	def __call__( self, steps ):
 		steps[ -1 ].E.discard( ( self.u, self.v ) )
 		try:
-			del steps[ -1 ].Label( (self.u, self.v) )
 			del steps[ -1 ].hE[ ( self.u, self.v ) ]
 			del steps[ -1 ].lE[ ( self.u, self.v ) ]
 		except KeyError:
